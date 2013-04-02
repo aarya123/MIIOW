@@ -11,9 +11,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MyActivity extends Activity {
 
@@ -30,15 +30,15 @@ public class MyActivity extends Activity {
         protected void onPreExecute()
         {
             p = ProgressDialog.show(MyActivity.this, "Please Wait",
-                    "Downloading data!", false);
+                    "Downloading data...", false);
         }
 
         protected String doInBackground(String... params)
         {
-            String response = null;
+            String response;
             HttpGet http = new HttpGet(UTILITIES.API_URL+"/path/info?children=on&format=json");
             HttpClient h = new DefaultHttpClient();
-            HttpResponse r = null;
+            HttpResponse r;
             try
             {
                 String authInfo = UTILITIES.ACCOUNT_KEY+":"+UTILITIES.ACCOUNT_SECRET;
@@ -55,11 +55,21 @@ public class MyActivity extends Activity {
 
         public void onPostExecute(String result)
         {
+            try {
+                JSONObject data=new JSONObject(result);
+                JSONArray jsonFileList=data.getJSONArray("children");
+                Toast.makeText(MyActivity.this,jsonFileList.toString(),Toast.LENGTH_LONG).show();
+                for(int i=0;i<jsonFileList.length();i++)
+                {
+                    JSONObject tempJsonObject = (JSONObject) jsonFileList.get(i);
+                    Toast.makeText(MyActivity.this,tempJsonObject.toString(),Toast.LENGTH_LONG).show();
+                }
+            } catch (JSONException e) {
+                Log.d("ERROR",e.getMessage());
+            }
             p.setMessage("Finished!");
             p.dismiss();
-            Log.d("Result",result);
             Toast.makeText(MyActivity.this,result,Toast.LENGTH_LONG).show();
-
         }
     }
 }
