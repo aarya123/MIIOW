@@ -5,7 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -17,10 +21,30 @@ import org.json.JSONObject;
 
 public class MyActivity extends Activity {
 
+    ListView directoryListView;
+    DirectoryAdapter a;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        new Login().execute();
+        //new Login().execute();
+        new DirectoryObjects("test","test",true);
+        new DirectoryObjects("blah","blah",false);
+        directoryListView= (ListView) findViewById(R.id.directory);
+        a = new DirectoryAdapter(getApplicationContext(), R.id.directory, DirectoryObjects.dirObj);
+        directoryListView.setAdapter(a);
+        directoryListView.setOnItemClickListener(new OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id)
+            {
+                    /*Event goingTo = a.getItem(position);
+                    Intent eventInfo = new Intent(Tab1.this, EventInfo.class);
+                    eventInfo.putExtra("eventId", goingTo.getId());
+                    eventInfo.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    Tab1.this.startActivity(eventInfo);
+                    new UpdateInterest().execute("" + position);*/
+            }
+        });
     }
 
     class Login extends AsyncTask<String, Void, String>
@@ -50,7 +74,7 @@ public class MyActivity extends Activity {
                 Log.d("ERROR", e1.getMessage());
                 return e1.getMessage();
             }
-            return response;
+            return response ;
         }
 
         public void onPostExecute(String result)
