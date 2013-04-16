@@ -53,6 +53,7 @@ public class MyActivity extends Activity {
                     if (DirectoryObject.cache.containsKey(file.getPath())) {
                         ArrayList<DirectoryObject> newDir = DirectoryObject.cache.get(file.getPath());
                         DirectoryObject.dirStack.push(newDir);
+                        listPathName.push(file.getPath());
                         a.clear();
                         a.addAll(DirectoryObject.getPeek());
                     } else {
@@ -104,7 +105,9 @@ public class MyActivity extends Activity {
                 r = h.execute(http);
                 response = EntityUtils.toString(r.getEntity());
             } catch (Exception e1) {
-                Toast.makeText(getApplicationContext(), "Failed to get data from server.", Toast.LENGTH_SHORT).show();
+                p = ProgressDialog.show(MyActivity.this, "Please Wait",
+                        "Searching for connection...", false);
+                //Toast.makeText(getApplicationContext(), "Failed to get data from server.", Toast.LENGTH_SHORT).show();
                 return e1.getMessage();
             }
             //Log.i("VALUES", "Response: "+response.toString());
