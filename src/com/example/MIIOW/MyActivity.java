@@ -6,10 +6,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,6 +25,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Stack;
 
+//TODO: Figure out connectivity problem, crashes if 4g isn't turned on
 public class MyActivity extends Activity {
 
     ListView directoryListView;
@@ -37,10 +40,6 @@ public class MyActivity extends Activity {
         login.execute("/");
         listPathName.push("/");
 
-        //array adapter should peek at top of dirStack, figure out way to roll back as well
-        //following executions happen onclick
-        //roll back on back button or something
-        //currently forget rolled back info, could possibly store
         directoryListView = (ListView) findViewById(R.id.directory);
         a = new DirectoryAdapter(getApplicationContext(), R.id.directory, DirectoryObject.getPeek());
         directoryListView.setAdapter(a);
@@ -63,12 +62,32 @@ public class MyActivity extends Activity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Not a directory.", Toast.LENGTH_SHORT).show();
                 }
-                    /*Event goingTo = a.getItem(position);
-                    Intent eventInfo = new Intent(Tab1.this, EventInfo.class);
-                    eventInfo.putExtra("eventId", goingTo.getId());
-                    eventInfo.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    Tab1.this.startActivity(eventInfo);
-                    new UpdateInterest().execute("" + position);*/
+            }
+        });
+        directoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //show a dialog to share
+                final PopupMenu popup = new PopupMenu(getApplicationContext(), view);
+                popup.inflate(R.menu.share_menu);
+                popup.show();
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.share:
+                                //send to Anubhaw's shit
+                                popup.dismiss();
+                                //include progress dialog?
+                                return true;
+                            case R.id.cancel:
+                                popup.dismiss();
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                //share
+                return true;
             }
         });
     }
