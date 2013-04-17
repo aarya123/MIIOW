@@ -20,12 +20,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.util.ArrayList;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Stack;
 
 //TODO: Figure out connectivity problem, crashes if 4g isn't turned on
@@ -77,11 +77,12 @@ public class MyActivity extends Activity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Not a directory.", Toast.LENGTH_SHORT).show();
                 }
-        }});
+            }
+        });
         directoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 //show a dialog to share
-                DirectoryObject selectedFile = (DirectoryObject)parent.getItemAtPosition(position);
+                DirectoryObject selectedFile = (DirectoryObject) parent.getItemAtPosition(position);
                 PopupMenu popup = new PopupMenu(getApplicationContext(), view);
                 popup.inflate(R.menu.share_menu);
                 popup.show();
@@ -116,8 +117,7 @@ public class MyActivity extends Activity {
         }
     }
 
-    class SendEmail extends AsyncTask<String, Void, String>
-    {
+    class SendEmail extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
             try {
@@ -129,8 +129,8 @@ public class MyActivity extends Activity {
             return null;
         }
     }
-    class Login extends AsyncTask<String, Void, String>
-    {
+
+    class Login extends AsyncTask<String, Void, String> {
         ProgressDialog p;
 
         protected void onPreExecute() {
@@ -191,25 +191,27 @@ public class MyActivity extends Activity {
             return homeList;
         }
     }
-    class Download extends AsyncTask<DirectoryObject, Void, Void>{
+
+    class Download extends AsyncTask<DirectoryObject, Void, Void> {
 
         @Override
         protected Void doInBackground(DirectoryObject... files) {
             String response;
-            try{
+            try {
                 URL url = new URL(files[0].getUrl());
                 URLConnection connection = url.openConnection();
                 connection.connect();
 
                 //download the file
                 InputStream input = new BufferedInputStream(url.openStream());
-                OutputStream output = new FileOutputStream(UTILITIES.DOWNLOAD_LOC+files[0].getPath());
+                OutputStream output = new FileOutputStream(UTILITIES.DOWNLOAD_LOC + files[0].getPath());
 
                 byte data[] = new byte[1024];
-                while(input.read(data) != -1){
+                while (input.read(data) != -1) {
                     output.write(data);
                 }
                 output.close();
+
                 input.close();
             } catch (MalformedURLException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
