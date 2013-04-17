@@ -18,7 +18,6 @@ public class DirectoryAdapter extends ArrayAdapter{
         this.list=list;
     }
 
-    // hold the elements in the layout
     public static class ViewHolder
     {
         public TextView objectName;
