@@ -10,6 +10,7 @@ public class UTILITIES {
     public static String ACCOUNT_KEY="ywdrXOJdA6pYydpGGGmIDTrM88ZVXW";
     public static String ACCOUNT_SECRET="k8WfVWexlQOKRSIgkJmU3H27Lc3ziY";
     public static String API_URL = "http://app.smartfile.com/api/2";
+    public static String DOWNLOAD_LOC = "/sdcard/MIIOWdownloads";
     public static boolean isOnline(Context c)
     {
         // Get connection service
