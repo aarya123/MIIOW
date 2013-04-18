@@ -2,6 +2,7 @@ package com.example.MIIOW;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
@@ -34,6 +35,8 @@ public class MyActivity extends Activity {
     ListView directoryListView;
     DirectoryAdapter a;
     Stack<String> listPathName = new Stack<String>(); //the path name of the currently displayed directory
+
+    DirectoryObject selectedFile; //not the best way to do this
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +85,7 @@ public class MyActivity extends Activity {
         directoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 //show a dialog to share
-                DirectoryObject selectedFile = (DirectoryObject) parent.getItemAtPosition(position);
+                selectedFile = (DirectoryObject) parent.getItemAtPosition(position);
                 PopupMenu popup = new PopupMenu(getApplicationContext(), view);
                 popup.inflate(R.menu.share_menu);
                 popup.show();
@@ -92,6 +95,8 @@ public class MyActivity extends Activity {
                         switch (item.getItemId()) {
                             case R.id.share:
                                 //send to Anubhaw's shit - send to intent called Propogate
+                                Download download = new Download();
+                                download.execute(selectedFile);
 
 
                                 //include progress dialog?
@@ -151,6 +156,7 @@ public class MyActivity extends Activity {
                 r = h.execute(http);
                 response = EntityUtils.toString(r.getEntity());
             } catch (Exception e1) {
+                //figure this out...attempt to reconnect
                 p = ProgressDialog.show(MyActivity.this, "Please Wait",
                         "Searching for connection...", false);
                 //Toast.makeText(getApplicationContext(), "Failed to get data from server.", Toast.LENGTH_SHORT).show();
@@ -192,34 +198,47 @@ public class MyActivity extends Activity {
         }
     }
 
-    class Download extends AsyncTask<DirectoryObject, Void, Void> {
+    class Download extends AsyncTask<DirectoryObject, Void, String> {
 
         @Override
-        protected Void doInBackground(DirectoryObject... files) {
-            String response;
+        protected String doInBackground(DirectoryObject... files) {
+            File temp;
             try {
                 URL url = new URL(files[0].getUrl());
                 URLConnection connection = url.openConnection();
                 connection.connect();
 
+                //set up temporary file destination
+                temp = File.createTempFile(files[0].getPath(), null, getFilesDir());
+
                 //download the file
                 InputStream input = new BufferedInputStream(url.openStream());
-                OutputStream output = new FileOutputStream(UTILITIES.DOWNLOAD_LOC + files[0].getPath());
+                OutputStream output = new FileOutputStream(temp);
 
                 byte data[] = new byte[1024];
                 while (input.read(data) != -1) {
                     output.write(data);
                 }
                 output.close();
-
                 input.close();
             } catch (MalformedURLException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                Toast.makeText(getApplicationContext(), "Download Failed. Could not connect to URL.", Toast.LENGTH_SHORT).show();
+                return null;
+                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                Toast.makeText(getApplicationContext(), "Download Failed.", Toast.LENGTH_SHORT).show();
+                return null;
+                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
-            return null;
+            return temp.getAbsolutePath();
+        }
+
+        protected void onPostExecute(String result) {
+            Intent propogate = new Intent(MyActivity.this, Propogate.class);
+            propogate.putExtra("downloadedFilePath", result);
+            startActivity(propogate);
+            return;
         }
     }
 }
