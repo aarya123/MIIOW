@@ -77,7 +77,7 @@ public class MyActivity extends Activity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.share:
-                                //send to Anubhaw's shit - send to intent called Propogate
+                                //send to Anubhaw's shit - send to intent called Propagate
                                 Download download = new Download();
                                 download.execute(selectedFile);
 
@@ -94,6 +94,8 @@ public class MyActivity extends Activity {
                 return true;
             }
         });
+        Intent propagate = new Intent(MyActivity.this, Propagate.class);
+        startActivity(propagate);
     }
 
     public void onBackPressed() {
@@ -117,7 +119,6 @@ public class MyActivity extends Activity {
             //String homeDir = "/";
             String response;
             HttpGet http = new HttpGet(UTILITIES.API_URL + "/path/info" + params[0] + "?children=on&format=json");
-            String string = UTILITIES.API_URL + "/path/info" + params[0] + "?children=on&format=json";
             HttpClient h = new DefaultHttpClient();
             HttpResponse r;
             try {
@@ -148,7 +149,7 @@ public class MyActivity extends Activity {
             ArrayList<DirectoryObject> homeList = new ArrayList<DirectoryObject>();
             try {
                 Log.i("VALUES", "Inside try.");
-                Log.i("VALUES", "Results: " + results.toString());
+                Log.i("VALUES", "Results: " + results);
                 JSONObject data = new JSONObject(results);
                 Log.i("VALUES", "data from path " + data.toString(5));
                 JSONArray jsonFileList = data.getJSONArray("children");
@@ -202,10 +203,9 @@ public class MyActivity extends Activity {
         }
 
         protected void onPostExecute(String result) {
-            Intent propogate = new Intent(MyActivity.this, Propogate.class);
-            propogate.putExtra("downloadedFilePath", result);
-            startActivity(propogate);
-            return;
+            Intent propagate = new Intent(MyActivity.this, Propagate.class);
+            propagate.putExtra("downloadedFilePath", result);
+            startActivity(propagate);
         }
     }
 }

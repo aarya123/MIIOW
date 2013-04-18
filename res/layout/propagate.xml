@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Email"
+			android:id="@+id/emailCB"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true"/>
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:visibility="invisible"
+			android:text="All Emails?"
+			android:id="@+id/allEmailCB"
+			android:layout_toRightOf="@+id/emailCB"
+			android:layout_alignParentTop="true"/>
+	<EditText
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:inputType="textEmailAddress"
+			android:visibility="gone"
+			android:hint="Enter Email To Send To"
+			android:id="@+id/emailAddy"
+			android:layout_below="@+id/emailCB"/>
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Text"
+			android:id="@+id/textCB"
+			android:layout_alignParentLeft="true"
+			android:layout_below="@+id/emailAddy"/>
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:visibility="invisible"
+			android:text="All Phone Numbers?"
+			android:id="@+id/allTextCB"
+			android:layout_toRightOf="@+id/textCB"
+			android:layout_below="@+id/emailAddy"
+			android:checked="false"/>
+	<EditText
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:visibility="gone"
+			android:inputType="phone"
+			android:text=""
+			android:hint="Enter Phone Number To Send To"
+			android:id="@+id/phoneNum"
+			android:layout_below="@+id/textCB"/>
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Tweet"
+			android:id="@+id/tweetCB"
+			android:layout_alignParentLeft="true"
+			android:layout_below="@+id/phoneNum"/>
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Print"
+			android:id="@+id/printCB"
+			android:layout_alignParentLeft="true"
+			android:layout_below="@+id/tweetCB"/>
+
+	<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="MIIOW!"
+			android:textSize="24dp"
+			android:id="@+id/submit"
+			android:layout_below="@+id/printCB"/>
+
+</RelativeLayout>
