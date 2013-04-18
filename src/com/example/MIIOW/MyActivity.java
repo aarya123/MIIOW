@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -74,6 +75,7 @@ public class MyActivity extends Activity {
                 popup.inflate(R.menu.share_menu);
                 popup.show();
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.share:
@@ -119,6 +121,7 @@ public class MyActivity extends Activity {
             //String homeDir = "/";
             String response;
             HttpGet http = new HttpGet(UTILITIES.API_URL + "/path/info" + params[0] + "?children=on&format=json");
+            String string = UTILITIES.API_URL + "/path/info" + params[0] + "?children=on&format=json";
             HttpClient h = new DefaultHttpClient();
             HttpResponse r;
             try {
@@ -180,8 +183,13 @@ public class MyActivity extends Activity {
                 connection.connect();
 
                 //set up temporary file destination
-                temp = File.createTempFile(files[0].getPath(), null, getFilesDir());
-
+                //try{
+                temp = new File(getFilesDir(), files[0].getName());
+                temp.createNewFile();
+                //}
+                /*catch(IOException e){
+                    return e.getMessage();
+                }*/
                 //download the file
                 InputStream input = new BufferedInputStream(url.openStream());
                 OutputStream output = new FileOutputStream(temp);
@@ -195,17 +203,21 @@ public class MyActivity extends Activity {
             } catch (MalformedURLException e) {
                 Toast.makeText(getApplicationContext(), "Download Failed. Could not connect to URL.", Toast.LENGTH_SHORT).show();
                 return null;
+                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             } catch (IOException e) {
                 Toast.makeText(getApplicationContext(), "Download Failed.", Toast.LENGTH_SHORT).show();
                 return null;
+                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
+
             return temp.getAbsolutePath();
         }
 
         protected void onPostExecute(String result) {
-            Intent propagate = new Intent(MyActivity.this, Propagate.class);
-            propagate.putExtra("downloadedFilePath", result);
-            startActivity(propagate);
+            Intent propogate = new Intent(MyActivity.this, Propogate.class);
+            propogate.putExtra("downloadedFilePath", result);
+            startActivity(propogate);
+            return;
         }
     }
 }
