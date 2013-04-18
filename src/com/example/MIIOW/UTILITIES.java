@@ -1,8 +1,14 @@
 package com.example.MIIOW;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.ContactsContract;
+import android.telephony.SmsManager;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class UTILITIES {
     public static String CLIENT_TOKEN="qIlbtu8nxNSSFcIvgcrP8t97AuwwhW";
@@ -11,19 +17,68 @@ public class UTILITIES {
     public static String ACCOUNT_SECRET="k8WfVWexlQOKRSIgkJmU3H27Lc3ziY";
     public static String API_URL = "http://app.smartfile.com/api/2";
     public static String DOWNLOAD_LOC = "/sdcard/MIIOWdownloads";
+    public static final String TWITTER_ACCESS_TOKEN = "1348177470-n4VCuo43YD8NFZTO2AgviBzm95Dgd4xom5IY4LS";
+    public static final String TWITTER_ACCESS_TOKEN_SECRET = "PJ6FKAXHZGedaFhsLozF4bcMqm4RKozJoBx6iRFDayI";
+    public static final String TWITTER_CONSUMER_KEY = "UJaAlQAjwN19yATvN5t3A";
+    public static final String TWITTER_CONSUMER_SECRET = "wxn6QvE44Mja9gB6nL7G02HN816196lRZVsk5uebcws";
+
     public static boolean isOnline(Context c)
     {
-        // Get connection service
-        ConnectivityManager cm = (ConnectivityManager) c
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        // Get connection info
+        ConnectivityManager cm = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        // Check status
         if (info != null)
-        {
             if (info.isConnected())
                 return true;
-        }
         return false;
+    }
+
+    public static ArrayList<String> getPhoneNumbers(Context c){
+
+        ArrayList<String> numberList = new ArrayList<String>();
+        Cursor phones = c.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        while (phones.moveToNext())
+            numberList.add(phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+        return numberList;
+    }
+
+    public static void sendSMS(ArrayList<String> phoneNumber, String message)
+    {
+        SmsManager sms = SmsManager.getDefault();
+        for(int i=0;i<phoneNumber.size();i++)
+            sms.sendTextMessage(phoneNumber.get(i), null, message, null, null);
+    }
+
+    public static String getEmails(Context context) {
+        String emlRecs = "";
+        HashSet<String> emlRecsHS = new HashSet<String>();
+        ContentResolver cr = context.getContentResolver();
+        String[] PROJECTION = new String[]{ContactsContract.RawContacts._ID,
+                ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.Contacts.PHOTO_ID,
+                ContactsContract.CommonDataKinds.Email.DATA,
+                ContactsContract.CommonDataKinds.Photo.CONTACT_ID};
+        String order = "CASE WHEN "
+                + ContactsContract.Contacts.DISPLAY_NAME
+                + " NOT LIKE '%@%' THEN 1 ELSE 2 END, "
+                + ContactsContract.Contacts.DISPLAY_NAME
+                + ", "
+                + ContactsContract.CommonDataKinds.Email.DATA
+                + " COLLATE NOCASE";
+        String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''";
+        Cursor cur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, PROJECTION, filter, null, order);
+        if (cur.moveToFirst()) {
+            do {
+                // names comes in hand sometimes
+                String name = cur.getString(1);
+                String emlAddr = cur.getString(3);
+
+                // keep unique only
+                if (emlRecsHS.add(emlAddr.toLowerCase())) {
+                    emlRecs+=emlAddr+",";
+                }
+            } while (cur.moveToNext());
+        }
+        cur.close();
+        return emlRecs;
     }
 }

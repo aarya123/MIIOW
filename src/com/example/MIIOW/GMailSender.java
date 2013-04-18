@@ -1,9 +1,5 @@
 package com.example.MIIOW;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
-import android.provider.ContactsContract;
 import android.util.Log;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -18,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Properties;
 
 public class GMailSender extends javax.mail.Authenticator {
@@ -67,40 +61,6 @@ public class GMailSender extends javax.mail.Authenticator {
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
         }
-    }
-
-    public static ArrayList<String> getNameEmailDetails(Context context) {
-        ArrayList<String> emlRecs = new ArrayList<String>();
-        HashSet<String> emlRecsHS = new HashSet<String>();
-        ContentResolver cr = context.getContentResolver();
-        String[] PROJECTION = new String[]{ContactsContract.RawContacts._ID,
-                ContactsContract.Contacts.DISPLAY_NAME,
-                ContactsContract.Contacts.PHOTO_ID,
-                ContactsContract.CommonDataKinds.Email.DATA,
-                ContactsContract.CommonDataKinds.Photo.CONTACT_ID};
-        String order = "CASE WHEN "
-                + ContactsContract.Contacts.DISPLAY_NAME
-                + " NOT LIKE '%@%' THEN 1 ELSE 2 END, "
-                + ContactsContract.Contacts.DISPLAY_NAME
-                + ", "
-                + ContactsContract.CommonDataKinds.Email.DATA
-                + " COLLATE NOCASE";
-        String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''";
-        Cursor cur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, PROJECTION, filter, null, order);
-        if (cur.moveToFirst()) {
-            do {
-                // names comes in hand sometimes
-                String name = cur.getString(1);
-                String emlAddr = cur.getString(3);
-
-                // keep unique only
-                if (emlRecsHS.add(emlAddr.toLowerCase())) {
-                    emlRecs.add(emlAddr);
-                }
-            } while (cur.moveToNext());
-        }
-        cur.close();
-        return emlRecs;
     }
 
     public class ByteArrayDataSource implements DataSource {

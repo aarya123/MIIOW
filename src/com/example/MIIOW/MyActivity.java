@@ -21,7 +21,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,35 +34,20 @@ public class MyActivity extends Activity {
     ListView directoryListView;
     DirectoryAdapter a;
     Stack<String> listPathName = new Stack<String>(); //the path name of the currently displayed directory
-
     DirectoryObject selectedFile; //not the best way to do this
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        /*ArrayList<String> test= GMailSender.getNameEmailDetails(this);
-        Toast.makeText(this,""+test.size(),Toast.LENGTH_LONG).show();
-        for(int i=0;i<test.size();i++)
-            Toast.makeText(this,test.get(i),Toast.LENGTH_LONG).show();*/
-        //new Login().execute();
-        /*Intent printIntent = new Intent(this, PrintDialogActivity.class);
-        printIntent.setDataAndType(Uri.parse("http://www.dha.com.tr/newpics/news/230620111356175716857.jpg"), "application/pdf");
-        printIntent.putExtra("title", "title");
-        startActivity(printIntent);*/
-        //new SendEmail().execute();
-        /*Intent next = new Intent(this, TweetToTwitterActivity.class);
-        startActivity(next);*/
         Login login = new Login();
         login.execute("/");
         listPathName.push("/");
-
         directoryListView = (ListView) findViewById(R.id.directory);
         a = new DirectoryAdapter(getApplicationContext(), R.id.directory, DirectoryObject.getPeek());
         directoryListView.setAdapter(a);
         directoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 DirectoryObject file = (DirectoryObject) parent.getItemAtPosition(position);
                 if (file.isDir()) {
                     //if the path has already been cached use that instead
@@ -90,7 +74,6 @@ public class MyActivity extends Activity {
                 popup.inflate(R.menu.share_menu);
                 popup.show();
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.share:
@@ -119,19 +102,6 @@ public class MyActivity extends Activity {
             DirectoryObject.cache.put(listPathName.pop(), oldDir);
             a.clear();
             a.addAll(DirectoryObject.getPeek());
-        }
-    }
-
-    class SendEmail extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                GMailSender sender = new GMailSender("avengers.miiow@gmail.com", "kickinass");
-                sender.sendMail("This is Subject", "This is Body", "avengers.miiow@gmail.com", "anubhaw.arya@gmail.com");
-            } catch (Exception e) {
-                Log.e("SendMail", e.getMessage(), e);
-            }
-            return null;
         }
     }
 
@@ -224,13 +194,10 @@ public class MyActivity extends Activity {
             } catch (MalformedURLException e) {
                 Toast.makeText(getApplicationContext(), "Download Failed. Could not connect to URL.", Toast.LENGTH_SHORT).show();
                 return null;
-                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             } catch (IOException e) {
                 Toast.makeText(getApplicationContext(), "Download Failed.", Toast.LENGTH_SHORT).show();
                 return null;
-                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-
             return temp.getAbsolutePath();
         }
 
