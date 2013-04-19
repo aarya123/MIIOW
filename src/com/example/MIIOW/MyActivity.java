@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.Toast;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -21,15 +20,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Stack;
 
-//TODO: Figure out connectivity problem, crashes if 4g isn't turned on
 public class MyActivity extends Activity {
 
     ListView directoryListView;
@@ -63,41 +56,31 @@ public class MyActivity extends Activity {
                         listPathName.push(file.getPath());
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "Not a directory.", Toast.LENGTH_SHORT).show();
+                    selectedFile = (DirectoryObject) parent.getItemAtPosition(position);
+                    PopupMenu popup = new PopupMenu(getApplicationContext(), view);
+                    popup.inflate(R.menu.share_menu);
+                    popup.show();
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.share:
+                                    //send to Anubhaw's shit - send to intent called Propagate
+                                    Intent propagate = new Intent(MyActivity.this, Propagate.class);
+                                    propagate.putExtra("onlineFilePath", selectedFile.getPath());
+                                    propagate.putExtra("fileName", selectedFile.getName());
+                                    startActivity(propagate);
+                                    //include progress dialog?
+                                    return true;
+                                case R.id.cancel:
+                                    return true;
+                            }
+                            return false;
+                        }
+                    });
                 }
             }
         });
-        directoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //show a dialog to share
-                selectedFile = (DirectoryObject) parent.getItemAtPosition(position);
-                PopupMenu popup = new PopupMenu(getApplicationContext(), view);
-                popup.inflate(R.menu.share_menu);
-                popup.show();
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.share:
-                                //send to Anubhaw's shit - send to intent called Propagate
-                                Download download = new Download();
-                                download.execute(selectedFile);
-
-
-                                //include progress dialog?
-                                return true;
-                            case R.id.cancel:
-                                return true;
-                        }
-                        return false;
-                    }
-                });
-                //share
-                return true;
-            }
-        });
-        Intent propagate = new Intent(MyActivity.this, Propagate.class);
-        startActivity(propagate);
     }
 
     public void onBackPressed() {
@@ -121,7 +104,6 @@ public class MyActivity extends Activity {
             //String homeDir = "/";
             String response;
             HttpGet http = new HttpGet(UTILITIES.API_URL + "/path/info" + params[0] + "?children=on&format=json");
-            String string = UTILITIES.API_URL + "/path/info" + params[0] + "?children=on&format=json";
             HttpClient h = new DefaultHttpClient();
             HttpResponse r;
             try {
@@ -172,52 +154,5 @@ public class MyActivity extends Activity {
         }
     }
 
-    class Download extends AsyncTask<DirectoryObject, Void, String> {
 
-        @Override
-        protected String doInBackground(DirectoryObject... files) {
-            File temp;
-            try {
-                URL url = new URL(files[0].getUrl());
-                URLConnection connection = url.openConnection();
-                connection.connect();
-
-                //set up temporary file destination
-                //try{
-                temp = new File(getFilesDir(), files[0].getName());
-                temp.createNewFile();
-                //}
-                /*catch(IOException e){
-                    return e.getMessage();
-                }*/
-                //download the file
-                InputStream input = new BufferedInputStream(url.openStream());
-                OutputStream output = new FileOutputStream(temp);
-
-                byte data[] = new byte[1024];
-                while (input.read(data) != -1) {
-                    output.write(data);
-                }
-                output.close();
-                input.close();
-            } catch (MalformedURLException e) {
-                Toast.makeText(getApplicationContext(), "Download Failed. Could not connect to URL.", Toast.LENGTH_SHORT).show();
-                return null;
-                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "Download Failed.", Toast.LENGTH_SHORT).show();
-                return null;
-                //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-
-            return temp.getAbsolutePath();
-        }
-
-        protected void onPostExecute(String result) {
-            Intent propogate = new Intent(MyActivity.this, Propogate.class);
-            propogate.putExtra("downloadedFilePath", result);
-            startActivity(propogate);
-            return;
-        }
-    }
 }

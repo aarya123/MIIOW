@@ -28,6 +28,10 @@ import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
+
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,7 +108,7 @@ public class Propagate extends Activity {
         });
         submit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                new GetExchangeLink().execute("/Resume.pdf");
+                new GetExchangeLink().execute(Propagate.this.getIntent().getExtras().getString("onlineFilePath"));
             }
         });
 
@@ -113,13 +117,14 @@ public class Propagate extends Activity {
 
     public void print(String path) {
         Intent printIntent = new Intent(this, PrintDialogActivity.class);
-        printIntent.setDataAndType(Uri.parse(path), "application/pdf");
-        printIntent.putExtra("MIIOW", "MIIOW");
+        printIntent.setDataAndType(Uri.parse("file://"+path), "application/pdf");
+        Log.d("MIIOW",Uri.parse(path).toString());
+        printIntent.putExtra("title", "MIIOW");
         startActivity(printIntent);
     }
 
     public void sendTexts(ArrayList<String> numbers, String message) {
-        UTILITIES.sendSMS(numbers, message);
+        UTILITIES.sendSMS(numbers, "I've shared a file on SmartFile at "+message);
     }
 
     class SendEmail extends AsyncTask<String, Void, String> {
@@ -135,10 +140,10 @@ public class Propagate extends Activity {
                     GMailSender sender = new GMailSender("avengers.miiow@gmail.com", "kickinass");
                     Log.d("MIIOW",strings[0]);
                     if (!strings[1].equals("asdfasdf"))
-                        sender.sendMail("MIIOW!", strings[0], "avengers.miiow@gmail.com", strings[1]);
+                        sender.sendMail("MIIOW!", "I've shared a file on SmartFile at "+strings[0], "avengers.miiow@gmail.com", strings[1]);
                     else {
                         String emails = UTILITIES.getEmails(Propagate.this);
-                        sender.sendMail("MIIOW!", strings[0], "avengers.miiow@gmail.com", emails);
+                        sender.sendMail("MIIOW!", "I've shared a file on SmartFile at "+strings[0], "avengers.miiow@gmail.com", emails);
                     }
                 } catch (Exception e) {
                     Log.e("MIIOW", e.getMessage(), e);
@@ -165,7 +170,7 @@ public class Propagate extends Activity {
                 OAuthService service = new ServiceBuilder().provider(TwitterApi.class).apiKey(UTILITIES.TWITTER_CONSUMER_KEY).apiSecret(UTILITIES.TWITTER_CONSUMER_SECRET).build();
                 Token accessToken = new Token(UTILITIES.TWITTER_ACCESS_TOKEN, UTILITIES.TWITTER_ACCESS_TOKEN_SECRET);
                 OAuthRequest request = new OAuthRequest(Verb.POST, "https://api.twitter.com/1.1/statuses/update.json");
-                request.addBodyParameter("status", strings[0]);
+                request.addBodyParameter("status", "I've shared a file on SmartFile at "+strings[0]);
                 service.signRequest(accessToken, request);
                 Response response = request.send();
                 return response.getBody();
@@ -240,12 +245,53 @@ public class Propagate extends Activity {
                 }
                 if(printCB.isChecked())
                 {
-                    print("path");
+                    new Download().execute(link,Propagate.this.getIntent().getExtras().getString("fileName"));
                 }
             } catch (JSONException e) {
                 Log.d("MIIOW",e.getMessage());
             }
         }
+    }
+    class Download extends AsyncTask<String, Void, String> {
+        ProgressDialog p;
 
+        protected void onPreExecute() {
+            p = ProgressDialog.show(Propagate.this, "Please Wait",
+                    "Downloading the file for printing...", false);
+        }
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL(params[0]);
+                URLConnection connection = url.openConnection();
+                connection.connect();
+                //set up temporary file destination
+                //try{
+                //}
+                /*catch(IOException e){
+                    return e.getMessage();
+                }*/
+                //download the file
+                InputStream input = new BufferedInputStream(url.openStream());
+                OutputStream output = new FileOutputStream("/sdcard/Download/"+params[1]);
+
+                byte data[] = new byte[1024];
+                while (input.read(data) != -1) {
+                    output.write(data);
+                }
+                output.close();
+                input.close();
+            } catch (Exception e) {
+                Log.d("MIIOW",e.getMessage());
+                return null;
+            }
+            Log.d("MIIOW","/sdcard/Download/"+params[1]);
+            return "/sdcard/Download/"+params[1];
+        }
+
+        protected void onPostExecute(String result) {
+            p.setMessage("Finished!");
+            p.dismiss();
+            print(result);
+        }
     }
 }
