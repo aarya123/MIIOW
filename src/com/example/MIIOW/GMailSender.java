@@ -1,6 +1,7 @@
 package com.example.MIIOW;
 
 import android.util.Log;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Message;
@@ -16,6 +17,9 @@ import java.io.OutputStream;
 import java.security.Security;
 import java.util.Properties;
 
+/*
+    Class to manage methods that interact with the GMail API.
+ */
 public class GMailSender extends javax.mail.Authenticator {
     private String user;
     private String password;

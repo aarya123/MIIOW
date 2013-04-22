@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/*
+    The subclass of ArrayAdapter to be used to display contents on the screen. Holds an ArrayList of Directory Objects,
+    which represents the contents of a directory.
+ */
 public class DirectoryAdapter extends ArrayAdapter {
     Context c;
     private ArrayList<DirectoryObject> list;
