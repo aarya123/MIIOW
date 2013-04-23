@@ -37,6 +37,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /*
     Shows a a screen to select the services to send a file to, then propagates the file to all those services.
@@ -125,7 +126,7 @@ public class Propagate extends Activity {
     }
 
     public void sendTexts(ArrayList<String> numbers, String message) {
-        UTILITIES.sendSMS(numbers, "I've shared a file on SmartFile at " + message);
+        UTILITIES.sendSMS(numbers, message);
     }
 
     /*
@@ -251,7 +252,8 @@ public class Propagate extends Activity {
                     else {
                         ArrayList<String> number = new ArrayList<String>();
                         number.add(phoneNum.getText().toString());
-                        sendTexts(number, link);
+                        if(number.get(0).length()==10 && !Pattern.matches("[a-zA-Z]+",number.get(0)))
+                            sendTexts(number,link);
                     }
                 }
                 if (printCB.isChecked()) {

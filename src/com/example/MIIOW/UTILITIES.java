@@ -7,7 +7,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -16,12 +15,9 @@ import java.util.HashSet;
  */
 public class UTILITIES {
     //Constant strings
-    public static String CLIENT_TOKEN = "qIlbtu8nxNSSFcIvgcrP8t97AuwwhW";
-    public static String CLIENT_SECRET = "gvvRp1THczVjF9PRhyCUcm6LVNjgUk";
     public static String ACCOUNT_KEY = "ywdrXOJdA6pYydpGGGmIDTrM88ZVXW";
     public static String ACCOUNT_SECRET = "k8WfVWexlQOKRSIgkJmU3H27Lc3ziY";
     public static String API_URL = "http://app.smartfile.com/api/2";
-    public static String DOWNLOAD_LOC = "/sdcard/MIIOWdownloads";
     public static final String TWITTER_ACCESS_TOKEN = "1348177470-n4VCuo43YD8NFZTO2AgviBzm95Dgd4xom5IY4LS";
     public static final String TWITTER_ACCESS_TOKEN_SECRET = "PJ6FKAXHZGedaFhsLozF4bcMqm4RKozJoBx6iRFDayI";
     public static final String TWITTER_CONSUMER_KEY = "UJaAlQAjwN19yATvN5t3A";
@@ -58,11 +54,13 @@ public class UTILITIES {
 
         @param phoneNumber a list of phone numbers
         @param message the SMS message to send
+        @param c the calling activity
      */
-    public static void sendSMS(ArrayList<String> phoneNumber, String message) {
+    public static void sendSMS(ArrayList <String> phoneNumber, String message) {
         SmsManager sms = SmsManager.getDefault();
-        for (int i = 0; i < phoneNumber.size(); i++)
-            sms.sendTextMessage(phoneNumber.get(i), null, message, null, null);
+        ArrayList<String> mArray=sms.divideMessage(message);
+        for(String number:phoneNumber)
+            sms.sendMultipartTextMessage(number, null, mArray, null, null);
     }
 
     /*
@@ -90,10 +88,7 @@ public class UTILITIES {
         Cursor cur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, PROJECTION, filter, null, order);
         if (cur.moveToFirst()) {
             do {
-                // names comes in hand sometimes
-                String name = cur.getString(1);
                 String emlAddr = cur.getString(3);
-
                 // keep unique only
                 if (emlRecsHS.add(emlAddr.toLowerCase())) {
                     emlRecs += emlAddr + ",";
