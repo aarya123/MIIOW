@@ -126,7 +126,7 @@ public class Propagate extends Activity {
     }
 
     public void sendTexts(ArrayList<String> numbers, String message) {
-        UTILITIES.sendSMS(numbers, message);
+        UTILITIES.sendSMS(numbers, "I've shared a file on SmartFile at " +message);
     }
 
     /*

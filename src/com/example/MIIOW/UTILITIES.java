@@ -15,9 +15,9 @@ import java.util.HashSet;
  */
 public class UTILITIES {
     //Constant strings
-    public static String ACCOUNT_KEY = "ywdrXOJdA6pYydpGGGmIDTrM88ZVXW";
-    public static String ACCOUNT_SECRET = "k8WfVWexlQOKRSIgkJmU3H27Lc3ziY";
-    public static String API_URL = "http://app.smartfile.com/api/2";
+    public static final String ACCOUNT_KEY = "ywdrXOJdA6pYydpGGGmIDTrM88ZVXW";
+    public static final String ACCOUNT_SECRET = "k8WfVWexlQOKRSIgkJmU3H27Lc3ziY";
+    public static final String API_URL = "http://app.smartfile.com/api/2";
     public static final String TWITTER_ACCESS_TOKEN = "1348177470-n4VCuo43YD8NFZTO2AgviBzm95Dgd4xom5IY4LS";
     public static final String TWITTER_ACCESS_TOKEN_SECRET = "PJ6FKAXHZGedaFhsLozF4bcMqm4RKozJoBx6iRFDayI";
     public static final String TWITTER_CONSUMER_KEY = "UJaAlQAjwN19yATvN5t3A";
